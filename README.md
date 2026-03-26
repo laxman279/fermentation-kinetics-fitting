@@ -52,7 +52,6 @@ Then open notebooks in order 01 → 04.
 
 The ground-truth parameters approximate a *Saccharomyces cerevisiae* aerobic
 batch fermentation on glucose:
-
 - μ_max = 0.45 1/h corresponds to a doubling time of ~1.5 h, typical for
   yeast on glucose under aerobic conditions.
 - Ks = 0.12 g/L is in the standard range for yeast on glucose (literature: 0.1–1 g/L).
