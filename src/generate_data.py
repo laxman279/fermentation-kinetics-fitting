@@ -20,7 +20,11 @@ def monod_ode(t, y, mu_max, Ks, Yxs):
 
 # Solve forward in time
 t_span = (0, 20)
-t_eval = np.linspace(0, 20, 25)
+# t_eval = np.linspace(0, 20, 25)
+t_early = np.linspace(0, 6, 8)   # lag and early exponential
+t_transition = np.linspace(7, 12, 15)  # dense around depletion (KEY)
+t_late = np.linspace(13, 20, 8)    # stationary
+t_eval = np.concatenate([t_early, t_transition, t_late])
 sol = solve_ivp(monod_ode, t_span, [X0, S0],
                 args=(mu_max_true, Ks_true, Yxs_true),
                 t_eval=t_eval, dense_output=True)
