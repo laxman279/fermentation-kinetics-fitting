@@ -35,12 +35,15 @@ def monod_ode(t, y, mu_max, Ks, Yxs):
     mu = mu_max * S / (Ks + S) if S > 0 else 0
     dXdt = mu * X
     dSdt = -(1 / Yxs) * mu * X
-    return [dXdt, dSdt]
-
+    return [dXdt, dSdt] 
 
 def simulate_monod(params, t_eval, X0, S0):
     """
     Forward-simulate the Monod model and return predicted [X, S] at t_eval.
+
+    Returns arrays of NaN if the ODE solver fails — this allows downstream
+    optimization routines to detect and avoid pathological parameter sets
+    without crashing.
 
     Parameters
     ----------
@@ -104,7 +107,7 @@ def haldane_ode(t, y, mu_max, Ks, Ki, Yxs):
     y : [X, S]
     mu_max : float, max specific growth rate (1/h)
     Ks : float, half-saturation constant (g/L)
-    Ki : float, substrate inhibition constant (g/L). Larger = less inhibition.
+    Ki : float, substrate inhibition constant (g/L). Larger => less inhibition.
     Yxs : float, biomass yield (g/g)
     """
     X, S = y

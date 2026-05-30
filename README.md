@@ -48,6 +48,22 @@ jupyter notebook
 
 Then open notebooks in order 01 → 04.
 
+## Parameter rationale
+
+The ground-truth parameters approximate a *Saccharomyces cerevisiae* aerobic
+batch fermentation on glucose:
+
+- μ_max = 0.45 1/h corresponds to a doubling time of ~1.5 h, typical for
+  yeast on glucose under aerobic conditions.
+- Ks = 0.12 g/L is in the standard range for yeast on glucose (literature: 0.1–1 g/L).
+- Yxs = 0.50 g/g reflects aerobic respiratory growth (theoretical maximum ~0.55 g/g).
+- S0 = 10 g/L (1% glucose) is a standard laboratory fermentation substrate
+  concentration.
+- X0 = 0.05 g/L corresponds to a typical inoculum OD600 ≈ 0.1.
+
+The ratio S0/Ks ≈ 83 is realistic for industrial fermentations but is also
+what creates the Ks identifiability challenge demonstrated in this project.
+
 ## Results
 
 ### Parameter recovery (Monod)
