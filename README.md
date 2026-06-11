@@ -109,6 +109,6 @@ pure Monod kinetics (no substrate inhibition).
 1.Both Monod and Haldane fits achieved comparable fits to the data (final cost: Monod 0.0200, Haldane 0.0197), but with very different parameter values. This illustrates a well-known parameter identifiability problem with batch fermentation data: when S0 >> Ks throughout most of the experiment, Ks is poorly constrained, and the optimizer finds non-unique parameter combinations. Reliable Ks estimation typically requires chemostat data at varying dilution rates.
 
 
-## Author
+## Written by-
 
 Laxman Giri — B.Tech, Biochemical Engineering and Biotechnology, IIT Delhi
