@@ -15,7 +15,7 @@ Predicting and optimizing microbial cell factories requires kinetic parameters (
 
 ## Dataset
 
-Currently uses synthetic batch fermentation data generated from a known Monod model with added Gaussian measurement noise (5% relative). This allows validation of the fitting pipeline against ground truth. See `src/generate_data.py` and `data/README.md`.
+Uses synthetic batch fermentation data generated from a known Monod model with added Gaussian measurement noise (5% relative). This allows validation of the fitting pipeline against ground truth. See `src/generate_data.py` and `data/README.md`.
 
 ## Repository structure
 ```
