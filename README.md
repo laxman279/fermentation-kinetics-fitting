@@ -98,11 +98,8 @@ inhibition is not supported by the data.
    was implicitly trying to recover Monod from Haldane.
 
 2. **Akaike Information Criterion.** ΔAIC = AIC(Haldane) − AIC(Monod) = +2.13,
-   marginally favoring Monod. The Haldane fit's higher AIC primarily reflects
-   the parsimony penalty (+2 per extra parameter) rather than substantially
-   worse residuals. The simpler model is preferred not because it fits better,
-   but because the more complex model fits no better despite an extra degree
-   of freedom — the textbook signature of an unjustified parameter.
+   marginally favoring Monod. The higher AIC for the Haldane model is mainly due to the penalty for adding an extra parameter, not because its residuals are much worse. In other words, the simpler model is preferred because the added complexity in the Haldane model does not meaningfully improve the fit. That makes the extra parameter hard to justify.
+
 
 This is the expected result, since the synthetic data was generated under
 pure Monod kinetics (no substrate inhibition).
