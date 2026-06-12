@@ -66,112 +66,52 @@ what creates the Ks identifiability challenge demonstrated in this project.
 
 ## Results
 
-### Synthetic-data ground truth
+### Parameter recovery (Monod)
 
-The dataset was generated from a known Monod model with relative Gaussian noise:
+The Monod model recovered μ_max and Yxs within ~10% of ground-truth values
+from synthetic batch data:
 
-```text
-mu_max_true = 0.45 1/h
-Ks_true     = 0.12 g/L
-Yxs_true    = 0.50 g/g
-X0          = 0.05 g/L
-S0          = 10.0 g/L
-noise       = 5% relative Gaussian
-n_data      ≈ 31 time points
-```
+- μ_max = 0.48 h⁻¹ (ground truth: 0.45)
+- Yxs   = 0.44 g/g (ground truth: 0.50)
+- Ks    = 0.72 g/L (ground truth: 0.12)
 
-Because the ground truth is known, the fitted parameters can be evaluated directly rather than only judged by visual fit quality.
+Ks recovery was substantially poorer than the other parameters. This reflects
+a well-known parameter identifiability limitation: when S₀ >> Ks throughout
+most of the batch (here, S₀ = 10 g/L vs Ks = 0.12 g/L), the Monod term
+S/(Ks+S) is approximately 1 for most of the experiment, leaving Ks weakly
+constrained by the data. Reliable Ks estimation typically requires chemostat
+data at varying dilution rates rather than batch experiments. The result was
+robust to multiple initial guesses (the optimizer converged to the same
+parameter values from different starting points), indicating this is not a
+local-minimum issue but a structural property of batch data.
 
-### Parameter recovery: Monod model
+### Model comparison (Monod vs Haldane)
 
-The Monod model recovered μ_max and Yxs reasonably well, but not Ks:
+The Haldane substrate-inhibition model was fit to the same data using a
+4-parameter version with Ki as the additional inhibition constant. Two
+independent lines of evidence converge on the same conclusion: substrate
+inhibition is not supported by the data.
 
-```text
-mu_max = 0.4802 1/h   (truth 0.45 → within ~7%)
-Ks     = 0.7245 g/L   (truth 0.12 → off by ~6×)
-Yxs    = 0.4441 g/g   (truth 0.50 → within ~12%)
-final cost (SSR/2) = 0.060898
-```
+1. **Ki pinned at upper bound.** The Haldane optimizer drove Ki to the upper
+   bound of the search range (1000 g/L). As Ki → ∞, the Haldane term
+   S²/Ki → 0 and Haldane mathematically reduces to Monod. The optimizer
+   was implicitly trying to recover Monod from Haldane.
 
-The key result is not that the fit failed. The overall fit is clean, but Ks is poorly identified. Four observations support this interpretation:
+2. **Akaike Information Criterion.** ΔAIC = AIC(Haldane) − AIC(Monod) = +2.13,
+   marginally favoring Monod. The Haldane fit's higher AIC primarily reflects
+   the parsimony penalty (+2 per extra parameter) rather than substantially
+   worse residuals. The simpler model is preferred not because it fits better,
+   but because the more complex model fits no better despite an extra degree
+   of freedom — the textbook signature of an unjustified parameter.
 
-1. Ks is far from the ground truth despite a good overall fit.
-2. The result is robust to initial guess; different starting points converge to the same value.
-3. The problem is model-independent; Monod and Haldane return nearly identical Ks values.
-4. Substrate residuals show a systematic negative bias, consistent with overestimated Ks and slower predicted substrate consumption.
+This is the expected result, since the synthetic data was generated under
+pure Monod kinetics (no substrate inhibition).
 
-The root cause is that S0 = 10 g/L is much larger than Ks = 0.12 g/L. For most of the batch, the Monod term S/(Ks + S) is close to 1, so Ks has little influence on the trajectory. Reliable Ks estimation would require experiments that probe low-substrate regimes, such as chemostat experiments at varying dilution rates.
-
-### Model comparison: Monod vs Haldane
-
-The Haldane model gave almost the same fit, but its extra inhibition parameter was not supported:
-
-```text
-mu_max = 0.4863 1/h
-Ks     = 0.7610 g/L
-Ki     = 1000.0 g/L   (pinned at upper bound)
-Yxs    = 0.4441 g/g
-final cost (SSR/2) = 0.061030
-```
-
-As Ki approaches infinity, the Haldane term S²/Ki approaches zero, so the Haldane model mathematically collapses back to Monod. The optimizer driving Ki to the upper bound means it was trying to remove substrate inhibition from the model.
-
-The AIC comparison also favors Monod:
-
-```text
-AIC (Monod, 3 params)   = -380.42
-AIC (Haldane, 4 params) = -378.28
-ΔAIC (Haldane - Monod)  = +2.13
-```
-
-The higher AIC for Haldane mainly reflects the penalty for the extra parameter. Haldane also has a slightly worse final cost than Monod (0.061030 vs 0.060898), so the extra parameter does not improve the fit. This is expected because the synthetic data was generated under pure Monod kinetics.
-
-### Residual diagnostics
-
-The residual statistics were:
-
-```text
-Monod biomass:      mean = -0.0183, std = 0.1684   (|mean|/std ≈ 0.11)
-Monod substrate:    mean = -0.3327, std = 0.4917   (|mean|/std ≈ 0.68)
-Haldane biomass:    mean = -0.0181, std = 0.1685
-Haldane substrate:  mean = -0.3335, std = 0.4921
-```
-
-Biomass residuals are centered near zero and show no strong time-dependent trend. Substrate residuals have a stronger negative bias, consistent with the Ks identifiability issue.
-
-Shapiro-Wilk normality tests gave:
-
-```text
-Monod biomass:      W = 0.9368, p = 0.0673  → fail to reject normality
-Monod substrate:    W = 0.7526, p < 0.0001  → reject normality
-Haldane biomass:    W = 0.9373, p = 0.0696  → fail to reject normality
-Haldane substrate:  W = 0.7540, p < 0.0001  → reject normality
-```
-
-The biomass residuals are consistent with the Gaussian-noise assumption used in ordinary least squares. The substrate residuals are non-normal because the data were generated with 5% relative noise. This makes the residual variance depend on substrate concentration and shrink near depletion, violating the constant-variance assumption. The point estimates remain useful, but uncertainty estimates and AIC would be more rigorous under weighted least squares, with residuals weighted by inverse expected variance.
-
-### Bootstrap identifiability analysis
-
-Bootstrap resampling showed that Ks is much less stable than Yxs:
-
-```text
-Parameter    95% CI width
-mu_max       0.6259
-Ks           6.0435
-Yxs          0.0184
-```
-
-Ks and μ_max were strongly coupled across bootstrap resamples (r = +0.96). This explains the identifiability problem: the optimizer can move along a broad μ_max-Ks ridge while producing similar batch trajectories. Yxs was nearly uncorrelated with both parameters (r ≈ 0.1), indicating that it is independently identifiable from this dataset.
 
 ## Learnings
+1.Both Monod and Haldane fits achieved comparable fits to the data (final cost: Monod 0.0200, Haldane 0.0197), but with very different parameter values. This illustrates a well-known parameter identifiability problem with batch fermentation data: when S0 >> Ks throughout most of the experiment, Ks is poorly constrained, and the optimizer finds non-unique parameter combinations. Reliable Ks estimation typically requires chemostat data at varying dilution rates.
 
-1. Batch fermentation data can recover μ_max and Yxs reasonably well, but Ks is weakly constrained when S0 >> Ks.
-2. The poor Ks estimate is not a local-minimum problem. It is structural: the data do not contain enough low-substrate information to identify Ks.
-3. Haldane is not justified for this dataset. Ki is pinned at the upper bound, the final cost is slightly worse than Monod, and AIC favors the simpler Monod model.
-4. Residual diagnostics reveal that biomass fits satisfy the Gaussian-noise assumption better than substrate fits.
-5. Weighted least squares would be a more statistically rigorous next step because the dataset uses relative measurement noise.
-6. Bootstrap analysis confirms the mechanism of non-identifiability: μ_max and Ks are highly correlated, while Yxs remains independently identifiable.
 
-## Written by-
+## Author
 
 Laxman Giri — B.Tech, Biochemical Engineering and Biotechnology, IIT Delhi
