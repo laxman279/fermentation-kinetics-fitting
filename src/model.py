@@ -151,3 +151,4 @@ def residuals_haldane(params, t_data, X_data, S_data, X0, S0):
     X_res = (X_pred - X_data) / X_scale
     S_res = (S_pred - S_data) / S_scale
     return np.concatenate([X_res, S_res])
+    
