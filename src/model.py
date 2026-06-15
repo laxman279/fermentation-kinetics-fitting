@@ -1,6 +1,5 @@
 """
 Kinetic models for batch fermentation.
-
 Each model is defined as a system of ODEs returning [dX/dt, dS/dt],
 where X is biomass concentration (g/L) and S is substrate concentration (g/L).
 """
@@ -12,7 +11,6 @@ from scipy.integrate import solve_ivp
 def monod_ode(t, y, mu_max, Ks, Yxs):
     """
     Monod growth kinetics: mu = mu_max * S / (Ks + S)
-
     Parameters
     ----------
     t : float
@@ -40,7 +38,6 @@ def monod_ode(t, y, mu_max, Ks, Yxs):
 def simulate_monod(params, t_eval, X0, S0):
     """
     Forward-simulate the Monod model and return predicted [X, S] at t_eval.
-
     Returns arrays of NaN if the ODE solver fails — this allows downstream
     optimization routines to detect and avoid pathological parameter sets
     without crashing.
@@ -78,7 +75,6 @@ def simulate_monod(params, t_eval, X0, S0):
 def residuals_monod(params, t_data, X_data, S_data, X0, S0):
     """
     Compute residuals between predicted and observed [X, S] for given parameters.
-
     Returns a flat array of length 2*N where N = len(t_data),
     suitable for scipy.optimize.least_squares.
     """
