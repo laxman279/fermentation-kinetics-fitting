@@ -9,7 +9,7 @@
 - Yx/s = 0.5 g biomass / g substrate
 - Initial biomass X₀ = 0.05 g/L
 - Initial substrate S₀ = 10.0 g/L
-- Measurement noise: 5% relative Gaussian (proportional to local value)
+- Measurement noise: 5% relative Gaussian(proportional to local value)
 
 ## Columns
 
